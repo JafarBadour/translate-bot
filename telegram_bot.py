@@ -43,7 +43,10 @@ class TelegramBot:
         message = data['message']
 
         self.chat_id = message['chat']['id']
-        self.incoming_message_text = message['text'].lower()
+        try:
+            self.incoming_message_text = message['text'].lower()
+        except:
+            return
         self.first_name = message['from']['first_name']
         self.last_name = message['from']['last_name']
         if 'forward_sender_name' in message.keys() or 'forward_from' in message.keys():

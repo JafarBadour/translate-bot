@@ -13,11 +13,12 @@ def index():
     req = request.get_json()
     bot = TelegramBot()
     print(req)
-    bot.parse_webhook_data(req)
+
     try:
+        bot.parse_webhook_data(req)
         success = bot.action()
     except:
-        pass
+        success = None
     return jsonify(success=success)  # TODO: Success should reflect the success of the reply
 
 
@@ -27,6 +28,11 @@ def sup():
 
 
 if __name__ == '__main__':
+    ngrokserver = input('Run ./ngrok http 5000\n and tell me what is it:\n')
+    f = open('configs.conf', 'r')
+    x = f.readlines()
+    x[1] = ';'.join([x[1].split(';')[0], ngrokserver])
+    open('configs.conf', 'w').write(''.join(x))
     app.run(port=5000, debug=True)
 
 # https://telegram.me

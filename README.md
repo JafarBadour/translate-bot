@@ -18,3 +18,15 @@ Configure conditional actions based on Telegram message text in telegram_bot.py 
 
 Run the app server however you have python3.7 set to PATH:
 > $ python3.7 app.py
+
+# Docker version
+You should run
+
+```shell script
+sudo docker pull jafarbadour/telegram-translator-bot:latest
+./ngrok http 5000
+```
+Now you should get the tunnel url and then insert it after running this command
+```shell script
+sudo docker run --network host -ti jafarbadour/telegram-translator-bot:latest
+```
