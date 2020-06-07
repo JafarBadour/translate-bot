@@ -38,3 +38,4 @@ qtconsole~=4.7.4
 ipywidgets~=7.5.1
 attrs~=19.3.0
 pyrsistent~=0.16.0
+flask

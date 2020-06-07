@@ -1,6 +1,17 @@
 import requests
 
-from config import TELEGRAM_SEND_MESSAGE_URL
+from googletrans import Translator
+from config import config
+
+
+def get_name(message: dict):
+    res = ''
+    if 'first_name' in message.keys():
+        res = message['first_name']
+    if 'last_name' in message.keys():
+        res = res + ' ' + message['last_name']
+    return res
+
 
 class TelegramBot:
 
@@ -19,7 +30,7 @@ class TelegramBot:
         self.text = None
         self.first_name = None
         self.last_name = None
-
+        self.translator = Translator()
 
     def parse_webhook_data(self, data):
         """
@@ -35,7 +46,20 @@ class TelegramBot:
         self.incoming_message_text = message['text'].lower()
         self.first_name = message['from']['first_name']
         self.last_name = message['from']['last_name']
-
+        if 'forward_sender_name' in message.keys() or 'forward_from' in message.keys():
+            try:
+                self.forwarded_from = message['forward_from']
+                print(self.forwarded_from, 'sip')
+                self.forwarded_name = get_name(self.forwarded_from)
+                print('done')
+            except:
+                self.forwarded_from = {
+                    'forward_sender_name': message['forward_sender_name']
+                }
+                self.forwarded_name = message['forward_sender_name']
+            self.forwarded_text = message['text']
+        else:
+            self.forwarded_from = None
 
     def action(self):
         """
@@ -47,26 +71,33 @@ class TelegramBot:
 
         success = None
 
-        if self.incoming_message_text == '/hello':
-            self.outgoing_message_text = "Hello {} {}!".format(self.first_name, self.last_name)
+        if self.incoming_message_text == '/start':
+            self.outgoing_message_text = "Hello {} {}!".format(self.first_name, self.last_name) + \
+                '\n Send me only text ... if you send photos i will be fucked :)'
             success = self.send_message()
-        
-        if self.incoming_message_text == '/rad':
-            self.outgoing_message_text = '🤙'
-            success = self.send_message()
-        
+            return success
+        print(self.forwarded_from)
+        if self.forwarded_from:
+            if not self.forwarded_text:
+                self.outgoing_message_text = self.first_name + ' ' + self.last_name + ':\n' + self.translator.translate(
+                    self.incoming_message_text).text
+            else:
+                self.outgoing_message_text = self.forwarded_name + ':\n' + self.translator.translate(
+                    self.forwarded_text).text
+            self.send_message()
+        else:
+            self.outgoing_message_text = self.translator.translate(self.incoming_message_text).text
+            self.send_message()
         return success
-
 
     def send_message(self):
         """
         Sends message to Telegram servers.
         """
-
-        res = requests.get(TELEGRAM_SEND_MESSAGE_URL.format(self.chat_id, self.outgoing_message_text))
+        conf = config()
+        res = requests.get(conf.get_TELEGRAM_SEND_MESSAGE_URL().format(self.chat_id, self.outgoing_message_text))
 
         return True if res.status_code == 200 else False
-    
 
     @staticmethod
     def init_webhook(url):
@@ -78,5 +109,3 @@ class TelegramBot:
         """
 
         requests.get(url)
-
-
