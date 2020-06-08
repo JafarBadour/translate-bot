@@ -28,11 +28,11 @@ def sup():
 
 
 if __name__ == '__main__':
-    ngrokserver = input('Run ./ngrok http 5000\n and tell me what is it:\n')
-    f = open('configs.conf', 'r')
-    x = f.readlines()
-    x[1] = ';'.join([x[1].split(';')[0], ngrokserver])
-    open('configs.conf', 'w').write(''.join(x))
+    # ngrokserver = input('Run ./ngrok http 5000\n and tell me what is it:\n')
+    # f = open('configs.conf', 'r')
+    # x = f.readlines()
+    # x[1] = ';'.join([x[1].split(';')[0], ngrokserver])
+    # open('configs.conf', 'w').write(''.join(x))
     app.run(port=5000, debug=True)
 
 # https://telegram.me

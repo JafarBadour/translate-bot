@@ -30,3 +30,6 @@ Now you should get the tunnel url and then insert it after running this command
 ```shell script
 sudo docker run --network host -ti jafarbadour/telegram-translator-bot:latest
 ```
+
+
+You should manually put the ngrok url in configs.conf
